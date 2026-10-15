@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "1c": {
+      "type": "http",
+      "url": "http://127.0.0.1:6003/mcp"
+    },
+    "b24-dev-mcp": {
+      "type": "http",
+      "url": "https://mcp-dev.bitrix24.com/mcp"
+    }
+  }
+}

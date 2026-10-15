@@ -13,3 +13,9 @@ ConfigDumpInfo.xml
 # Редакторы
 .vscode/
 .idea/
+
+# Локальные настройки Claude Code
+.claude/settings.local.json
+
+# Реестр баз 1С — у каждого разработчика свой, хранит пароли
+.v8-project.json
