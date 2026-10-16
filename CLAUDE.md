@@ -34,7 +34,7 @@ Deliverables (per PRD «Результат работ»):
 
 Clicking «Отправить» in the outgoing-email form no longer drops the letter into «Исходящие» for the scheduled job «Получение и отправка электронных писем». Instead, the form writes the letter, starts a background job that sends it, and closes immediately. A client handler waits for the job and shows the result.
 
-- **Borrowed objects:** only `Документ.ЭлектронноеПисьмоИсходящее` and its `ФормаДокумента`. Everything else in KA (common modules `УправлениеЭлектроннойПочтой`, `Взаимодействия`, `РаботаСПочтовымиСообщениями`, `ДлительныеОперации`, registers `ЗаблокированныеДляПолученияУчетныеЗаписи` and `НепринятыеКОбработкеПочтовымСерверомИсходящиеПисьма`) is called from extension code without borrowing.
+- **Borrowed objects:** only `Документ.ЭлектронноеПисьмоИсходящее` and its `ФормаДокумента`, plus what the form references and the extension can't load without: the journal `Взаимодействия`, the picture `КоллекцияПиктограммФайлов`, the enum `ВариантыВажностиВзаимодействия`, the catalog `Пользователи` and 8 document attributes (listed in PRD). Everything else in KA (common modules `УправлениеЭлектроннойПочтой`, `Взаимодействия`, `РаботаСПочтовымиСообщениями`, `ДлительныеОперации`, registers `ЗаблокированныеДляПолученияУчетныеЗаписи` and `НепринятыеКОбработкеПочтовымСерверомИсходящиеПисьма`) is called from extension code without borrowing.
 - **Interception style:** `&Перед`, `&После`, `&Вместо` with `ПродолжитьВызов()`. Never `&ИзменениеИКонтроль`.
 - **`моп_МгновеннаяОтправкаПисем`** (server common module):
   - `ДоступностьОтправки` is a pure function with no DB access. It holds the send-availability rules, so it is the main unit-test target.
