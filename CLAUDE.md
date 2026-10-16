@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П28» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development has moved to a client-server base on the office server `gemsrvr` (TASKS.md stage 0). What remains: setting it up, reviewing stages 1–5 there one by one, the build and install check, acceptance and handover. The Tooling section below still describes `ka-demo` until task 0.3 rewrites it.
+`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П28» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development, YAxUnit tests and the build stay in the local file base `ka-demo`: what remains for us is the local setup (task 0.2), reviewing stages 1–5 one by one, the build and install check, and fixing defects from acceptance. Acceptance (stage 7) is done by the company programmer in the client-server base `elektron_ka` on the office server `gemsrvr`; we don't run tests or scenarios there.
 
 The PRD deliberately departs from the director's original ТЗ: sending is asynchronous (background job, up to 3 attempts with pauses 0/10/30 s, user notifications), and the «Отправить сейчас» button is shown for letters in «Исходящие» in client-server bases too. Don't "restore" the ТЗ behavior.
 
@@ -61,13 +61,14 @@ Before assuming how standard code behaves, check it in `.local/ka-config` (see b
 
 - Never modify, reload or delete those extensions. Always pass `-Extension <Name>` to load scripts and never `-AllExtensions`.
 - The scheduled email job is disabled in this base.
-- It is a file base, so client-server behavior (the PRD's acceptance target) can't be verified locally.
+- It is a file base, so client-server behavior (the PRD's acceptance target) can't be verified locally; the programmer's acceptance on `gemsrvr` covers it.
 
 ### MCP servers (`.mcp.json`)
 
 - **`1c`**, at `http://127.0.0.1:6003/mcp`, gives live access to `ka-demo`: queries, metadata, code execution, the event log and BSL syntax help.
   - It is served by `tools/MCP_Toolkit_macos.epf`, which must be open in 1C:Enterprise with the server started. If `mcp__1c__*` calls fail, it isn't running.
   - Read-only checks are fine. Ask before changing data.
+  - The Toolkit may still be open in the server base `elektron_ka` instead of `ka-demo`. Check `СтрокаСоединенияИнформационнойБазы()` first and never change data there.
   - The MCP session sees new extension metadata only after `restart_1c_session`.
 - **`b24-dev-mcp`** holds the Bitrix24 REST docs. It isn't relevant to this project; it came along with the skills.
 
