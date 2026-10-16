@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Only the spec exists so far: `PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П19» to its acceptance scenarios. There is no `src/` or `build/` yet.
+`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П27» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests are green in `ka-demo`. What remains needs a real mailbox and a client-server base: tasks 0.2, 0.3, 4.7, 6.3 and the acceptance stage 7.
 
 The PRD deliberately departs from the director's original ТЗ: sending is asynchronous (background job, up to 3 attempts with pauses 0/10/30 s, user notifications), and the «Отправить сейчас» button is shown for letters in «Исходящие» in client-server bases too. Don't "restore" the ТЗ behavior.
 
@@ -28,8 +28,9 @@ Clicking «Отправить» in the outgoing-email form no longer drops the l
 - **Interception style:** `&Перед`, `&После`, `&Вместо` with `ПродолжитьВызов()`. Never `&ИзменениеИКонтроль`.
 - **`моп_МгновеннаяОтправкаПисем`** (server common module):
   - `ДоступностьОтправки` is a pure function with no DB access. It holds the send-availability rules, so it is the main unit-test target.
-  - Account locking reuses the KA register `ЗаблокированныеДляПолученияУчетныеЗаписи` with the same rules as `УправлениеЭлектроннойПочтой.ЗаблокироватьУчетнуюЗапись`: a record younger than 60 minutes means busy; an active scheduled-job background job also means busy. This is how instant send and the scheduled job avoid sending the same letter twice.
-  - `НачатьОтправку` deduplicates by the background-job key `"моп_ОтправкаПисьма_" + УникальныйИдентификатор`, clears the scheduled job's rejection record for the letter, then starts `ОтправитьПисьмоВФоне` through `ДлительныеОперации.ВыполнитьВФоне`.
+  - **No double send by hiding.** The scheduled job and «Отправить и получить почту» pick letters in one query up front, never re-check status, and unlock the account before writing results. So instead of waiting for them, instant send hides the letter: `ДатаКогдаОтправить = now + 10 min` while sending (both KA queries skip future «Когда отправить»), renewed when less than 5 min is left, cleared in the same write as the outcome. A draft gets the mark in the same write that makes it «Исходящее» (form `&После("ПередЗаписьюНаСервере")`). Only «Отправить сейчас» on a letter that was already «Исходящее» waits for jobs that started before the mark.
+  - Account locking reuses the KA register `ЗаблокированныеДляПолученияУчетныеЗаписи` with the 60-minute rule of `УправлениеЭлектроннойПочтой.ЗаблокироватьУчетнуюЗапись`, but a young record only counts while a possible holder is alive (scheduled job, the user command, or an earlier instant send for the same account; job description «Мгновенная отправка письма (<account UUID>)»). In a file base the record always counts. Release deletes the record only if `ДатаБлокировки` is still ours.
+  - `НачатьОтправку` deduplicates by the background-job key `"моп_ОтправкаПисьма_" + УникальныйИдентификатор`, clears the scheduled job's rejection record for the letter, hides an «Исходящее» letter, then starts `ОтправитьПисьмоВФоне` through `ДлительныеОперации.ВыполнитьВФоне`.
   - The temp storage for the result is not bound to the form, because the form closes right after the start. The client handler deletes it.
 - **`моп_МгновеннаяОтправкаПисемКлиент`** (client common module) waits through `ДлительныеОперацииКлиент.ОжидатьЗавершение` without an owner form and shows notifications per the Ф3 table.
 - **Borrowed `ФормаДокумента`:** `&Вместо("ОтправитьПисьмоКлиент")` holds the branching for Черновик/Исходящее × available/not available. `&После` handlers on `ОпределитьВидимостьДоступностьЭлементовВЗависимостиОтСтатусаПисьма` and `УправлениеДоступностью` control the «Отправить сейчас» button.
@@ -38,8 +39,10 @@ Clicking «Отправить» in the outgoing-email form no longer drops the l
 
 - For an existing letter, the standard `ПриЧтенииНаСервере` calls `ОпределитьВидимостьДоступностьЭлементовВЗависимостиОтСтатусаПисьма` **before** `ПриСозданииНаСервере`. Form attributes it needs must be filled inside the `&После` of that procedure, not in `ПриСозданииНаСервере`.
 - If availability fails for an «Исходящее» letter, don't call `ПродолжитьВызов()`. Otherwise the standard code sets `ОтправлятьСообщенияСразу = Истина` and sends synchronously.
-- The standard write adds the quoted original text when `ВключатьТелоИсходногоПисьма` is on. Writing an «Исходящее» letter again must not trigger that a second time.
-- `УдалятьПослеОтправки` is passed from the form as a parameter, because for «Исходящие» letters the answer to the standard question isn't written to the DB.
+- The standard write adds the quoted original text only for a «Черновик» (`НеобходимаОбработкаПисьмаОснования`), so writing an «Исходящее» letter again doesn't repeat it. We still write an «Исходящее» letter only when it is modified.
+- The standard save question («Отправить / Отправить и сохранить») is asked in `ОтправитьВыполнить` before `ОтправитьПисьмоКлиент`, by the account setting. The answer is written into the letter (`УдалятьПослеОтправки`) together with the hide mark, and the background job reads it from the letter.
+- `ОбработатьОшибкуОтправкиПисьма` doesn't change the letter status and logs by itself: returning to drafts is ours, don't log rejected recipients twice.
+- In BSP debug mode `ДлительныеОперации.ВыполнитьВФоне` runs synchronously even with `ЗапуститьВФоне`; no pauses or waits are possible there.
 - Use `КраткоеПредставлениеОшибки` for users and `ПодробноеПредставлениеОшибки` for the event log. Never use `РасширенноеПредставлениеОшибки`: it downloads error descriptions from the internet on each call.
 - The account is released only after the result is written, unlike in the scheduled job.
 
@@ -93,7 +96,9 @@ python3 .claude/skills/db-load-xml/scripts/db-load-xml.py -ConfigDir src/Мгн�
 
 - The framework is YAxUnit, already installed in `ka-demo`. Tests live in the server common module `мопТ_МгновеннаяОтправкаПисем` with `ИсполняемыеСценарии()`.
 - Tests that write to the DB run in a rolled-back transaction, and tests never send real email. Real sending is covered only by the manual scenarios П1–П19.
-- There is no runner script here yet. `../b24-task-timesheet/scripts/run-tests.sh` runs YAxUnit headless and can be adapted by changing `TEST_EXTENSION`. It runs `1cv8c ENTERPRISE … /C"RunUnitTests=<config.json>"` and reads the jUnit report and exit-code file.
+- `scripts/load.sh [Extension…]` fixes BOMs, runs `cfe-validate`, loads each extension with `-Extension` and updates the DB. `scripts/run-tests.sh` runs YAxUnit headless (`1cv8c ENTERPRISE … /C"RunUnitTests=…"`) and reads the jUnit report and exit-code file. Both run outside the sandbox.
+- Tests that touch letters create them in the rolled-back transaction; send-branch tests use a nonexistent account ref so a bug can't send real mail.
+- `db-cfe-admin check` on the test extension alone reports «Переменная не определена (моп_МгновеннаяОтправкаПисем)»: the isolated check doesn't see the product extension. The test run itself compiles fine.
   - YAxUnit silently skips a test module that fails to compile and still reports success. Treat `[ERR]` in its log, or zero executed tests, as a failure.
 
 ## Development method: TDD

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:cmi="http://v8.1c.ru/8.2/managed-application/cmi" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xen="http://v8.1c.ru/8.3/xcf/enums" xmlns:xpr="http://v8.1c.ru/8.3/xcf/predef" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.16">
+	<DocumentJournal uuid="346911b8-7cbd-424e-ad44-cb49d477d0db">
+		<InternalInfo>
+			<xr:GeneratedType name="DocumentJournalSelection.Взаимодействия" category="Selection">
+				<xr:TypeId>f21a347e-368b-4628-a5c3-147577fb99cf</xr:TypeId>
+				<xr:ValueId>7b8fb52a-2eda-4428-abdf-1112f57c3000</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentJournalList.Взаимодействия" category="List">
+				<xr:TypeId>ab897bda-99be-4259-8235-95b87f9423b6</xr:TypeId>
+				<xr:ValueId>4bfe27db-6f72-46af-9c99-7b4e7a70f18b</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentJournalManager.Взаимодействия" category="Manager">
+				<xr:TypeId>4c93cca4-fcc0-4394-937d-fdb53b4dcb2f</xr:TypeId>
+				<xr:ValueId>6c0703fa-de4f-4895-8306-f2ec0bf8740e</xr:ValueId>
+			</xr:GeneratedType>
+		</InternalInfo>
+		<Properties>
+			<ObjectBelonging>Adopted</ObjectBelonging>
+			<Name>Взаимодействия</Name>
+			<Comment/>
+			<ExtendedConfigurationObject>7da57c89-af2c-445a-96f7-39250f70306f</ExtendedConfigurationObject>
+		</Properties>
+		<ChildObjects/>
+	</DocumentJournal>
+</MetaDataObject>

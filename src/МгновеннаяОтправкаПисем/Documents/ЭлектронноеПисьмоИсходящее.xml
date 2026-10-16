@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:cmi="http://v8.1c.ru/8.2/managed-application/cmi" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xen="http://v8.1c.ru/8.3/xcf/enums" xmlns:xpr="http://v8.1c.ru/8.3/xcf/predef" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.16">
+	<Document uuid="95864ec1-740b-4f75-90c8-ba636ab745f1">
+		<InternalInfo>
+			<xr:GeneratedType name="DocumentObject.ЭлектронноеПисьмоИсходящее" category="Object">
+				<xr:TypeId>e810b0cd-d5a5-4a19-b976-13a533c377b4</xr:TypeId>
+				<xr:ValueId>8a8662a0-ae3f-4742-a6c1-96437af2a319</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentRef.ЭлектронноеПисьмоИсходящее" category="Ref">
+				<xr:TypeId>5f7afe49-84a1-4813-a46a-1e3df3939d5a</xr:TypeId>
+				<xr:ValueId>47ade3c1-47de-46c4-b1c0-aa5a9698adca</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentSelection.ЭлектронноеПисьмоИсходящее" category="Selection">
+				<xr:TypeId>673a68d2-8210-455c-aba4-d63465b80722</xr:TypeId>
+				<xr:ValueId>7b3a8ddc-cbb1-436d-b2e4-6bef8a73d0b8</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentList.ЭлектронноеПисьмоИсходящее" category="List">
+				<xr:TypeId>e95055df-b92d-4b2b-b7a9-ab36541db415</xr:TypeId>
+				<xr:ValueId>42028a09-6dab-4b38-82ec-1f0a2df82fbe</xr:ValueId>
+			</xr:GeneratedType>
+			<xr:GeneratedType name="DocumentManager.ЭлектронноеПисьмоИсходящее" category="Manager">
+				<xr:TypeId>7443c5cd-5fe4-4030-ab48-1aeb5f394fd4</xr:TypeId>
+				<xr:ValueId>c7577350-dec3-48a5-8bf9-c474cf2df765</xr:ValueId>
+			</xr:GeneratedType>
+		</InternalInfo>
+		<Properties>
+			<ObjectBelonging>Adopted</ObjectBelonging>
+			<Name>ЭлектронноеПисьмоИсходящее</Name>
+			<Comment/>
+			<ExtendedConfigurationObject>8f2b8a8e-4cd3-45e3-89ae-1cc4bd0ff30a</ExtendedConfigurationObject>
+			<NumberType>String</NumberType>
+			<NumberLength>11</NumberLength>
+			<NumberAllowedLength>Fixed</NumberAllowedLength>
+		</Properties>
+		<ChildObjects>
+			<Form>ФормаДокумента</Form>
+		
+			<Attribute uuid="83f7ea4e-379b-4298-82b3-d64ea61a64aa">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>Важность</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>de506523-241a-4845-9259-37066afbf16a</ExtendedConfigurationObject>
+					<Type><v8:Type>cfg:EnumRef.ВариантыВажностиВзаимодействия</v8:Type></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="8d050795-5589-4ad4-80f1-937bf85cba94">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>ДатаОтправления</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>0510206f-eef0-4a5e-aeb7-d53c26d34adb</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:dateTime</v8:Type><v8:DateQualifiers><v8:DateFractions>DateTime</v8:DateFractions></v8:DateQualifiers></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="87fd76e2-2655-49e2-b3c4-9921674ce78a">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>Ответственный</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>2ee0d56b-cd7c-42db-8fb6-c1567fe1967d</ExtendedConfigurationObject>
+					<Type><v8:Type>cfg:CatalogRef.Пользователи</v8:Type></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="05114a37-68c7-4d3f-8a7a-9402f4bfcce9">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>ОтправительПредставление</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>b0f6ea83-2849-4151-930d-692866919db3</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:string</v8:Type><v8:StringQualifiers><v8:Length>1024</v8:Length><v8:AllowedLength>Variable</v8:AllowedLength></v8:StringQualifiers></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="3cb6f2d4-28b5-45e5-acfe-e492b5519e7b">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>Тема</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>683861f9-9a5f-47db-8b03-959f839d5a3a</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:string</v8:Type><v8:StringQualifiers><v8:Length>1024</v8:Length><v8:AllowedLength>Variable</v8:AllowedLength></v8:StringQualifiers></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="058072a8-214c-490f-ba27-d6e52819115a">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>Комментарий</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>e19aefe7-634d-4218-8d40-75802d1691e0</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:string</v8:Type><v8:StringQualifiers><v8:Length>0</v8:Length><v8:AllowedLength>Variable</v8:AllowedLength></v8:StringQualifiers></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="2cf708e5-45eb-442b-9bab-98369cbc8a57">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>ДатаКогдаОтправить</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>97ec3768-2b7d-4032-a579-31ade741eb58</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:dateTime</v8:Type><v8:DateQualifiers><v8:DateFractions>DateTime</v8:DateFractions></v8:DateQualifiers></Type>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="e1e6dc32-43c4-45db-b9b0-fade161bdcd5">
+				<InternalInfo/>
+				<Properties>
+					<ObjectBelonging>Adopted</ObjectBelonging>
+					<Name>ДатаАктуальностиОтправки</Name>
+					<Comment/>
+					<ExtendedConfigurationObject>edf11909-7d5f-4077-9cf1-90c3ef67cf64</ExtendedConfigurationObject>
+					<Type><v8:Type>xs:dateTime</v8:Type><v8:DateQualifiers><v8:DateFractions>DateTime</v8:DateFractions></v8:DateQualifiers></Type>
+				</Properties>
+			</Attribute>
+		</ChildObjects>
+	</Document>
+</MetaDataObject>
