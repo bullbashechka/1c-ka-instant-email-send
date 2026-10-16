@@ -10,6 +10,16 @@ The PRD deliberately departs from the director's original ТЗ: sending is async
 
 All user-facing texts (notifications, error messages, refusal texts from `ДоступностьОтправки`) must match `PRD.md` word for word.
 
+## Working on a stage
+
+Every `TASKS.md` stage or task goes through three steps. Each step is agreed with the user before the next one starts:
+
+1. **Edge cases.** List the pitfalls of the stage as numbered edge cases, each with options and the recommended one first. The user is not a programmer: they decide only what affects the product and the user experience. Technical choices are ours; state them with the reason. Only read-only checks (code, `.local/ka-config`, reads through the `1c` MCP) are allowed in this step.
+2. **Implementation plan.** Write a plan from the agreed edge cases and wait for the user to approve it.
+3. **Implementation.** Carry out the approved plan.
+
+The user's «ок» closes the current step only; it never means "go implement". Until the plan is approved, don't install software, change data in a base, load extensions, edit `src/` or start the stand.
+
 ## Stack
 
 Strictly BSL (1C:Enterprise) in configuration extensions for «Комплексная автоматизация для Казахстана» ред. 2, version 2.4.5.21, БСП 3.1.7.382. Production is a client-server base. Python and PowerShell are used only by the vendored skill tooling.
@@ -61,6 +71,7 @@ Before assuming how standard code behaves, check it in `.local/ka-config` (see b
 
 - Never modify, reload or delete those extensions. Always pass `-Extension <Name>` to load scripts and never `-AllExtensions`.
 - The scheduled email job is disabled in this base.
+- Mail goes to a local Mailpit trap: `scripts/mailpit.sh start|stop|status`, web UI http://127.0.0.1:8025. It accepts only recipients `@test.local` and relays nothing outside. The accounts «Тест с сохранением» and «Тест без сохранения» connect to `127.0.0.1` (SMTP 1025, POP3 1110, no encryption). Mailpit listens on IPv4 only, so the accounts use `127.0.0.1`, not `localhost`.
 - It is a file base, so client-server behavior (the PRD's acceptance target) can't be verified locally; the programmer's acceptance on `gemsrvr` covers it.
 
 ### MCP servers (`.mcp.json`)
