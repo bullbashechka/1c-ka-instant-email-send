@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П27» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests are green in `ka-demo`. What remains needs a real mailbox and a client-server base: tasks 0.2, 0.3, 4.7, 6.3 and the acceptance stage 7.
+`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П28» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development has moved to a client-server base on the office server `gemsrvr` (TASKS.md stage 0). What remains: setting it up, reviewing stages 1–5 there one by one, the build and install check, acceptance and handover. The Tooling section below still describes `ka-demo` until task 0.3 rewrites it.
 
 The PRD deliberately departs from the director's original ТЗ: sending is asynchronous (background job, up to 3 attempts with pauses 0/10/30 s, user notifications), and the «Отправить сейчас» button is shown for letters in «Исходящие» in client-server bases too. Don't "restore" the ТЗ behavior.
 
