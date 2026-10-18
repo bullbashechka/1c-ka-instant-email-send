@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П28» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development, YAxUnit tests and the build stay in the local file base `ka-demo`: what remains for us is the local setup (task 0.2), reviewing stages 1–5 one by one, the build and install check, and fixing defects from acceptance. Acceptance (stage 7) is done by the company programmer in the client-server base `elektron_ka` on the office server `gemsrvr`; we don't run tests or scenarios there.
+`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П29» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development, YAxUnit tests and the build stay in the local file base `ka-demo`: what remains for us is the local setup (task 0.2), reviewing stages 1–5 one by one, the build and install check, and fixing defects from acceptance. Acceptance (stage 7) is done by the company programmer in the client-server base `elektron_ka` on the office server `gemsrvr`; we don't run tests or scenarios there.
 
 The PRD deliberately departs from the director's original ТЗ: sending is asynchronous (background job, up to 3 attempts with pauses 0/10/30 s, user notifications), and the «Отправить сейчас» button is shown for letters in «Исходящие» in client-server bases too. Don't "restore" the ТЗ behavior.
 
@@ -53,6 +53,7 @@ Clicking «Отправить» in the outgoing-email form no longer drops the l
 - The standard save question («Отправить / Отправить и сохранить») is asked in `ОтправитьВыполнить` before `ОтправитьПисьмоКлиент`, by the account setting. The answer is written into the letter (`УдалятьПослеОтправки`) together with the hide mark, and the background job reads it from the letter.
 - `ОбработатьОшибкуОтправкиПисьма` doesn't change the letter status and logs by itself: returning to drafts is ours, don't log rejected recipients twice.
 - In BSP debug mode `ДлительныеОперации.ВыполнитьВФоне` runs synchronously even with `ЗапуститьВФоне`; no pauses or waits are possible there.
+- The standard `ПередЗаписьюНаСервере` appends the quoted original text on every send-write of a «Черновик» (`ВыполняетсяОтправка` and `ВключатьТелоИсходногоПисьма`), and nothing clears the flag. So `ВернутьВЧерновики` clears `ВключатьТелоИсходногоПисьма`, or the next «Отправить» quotes twice.
 - Use `КраткоеПредставлениеОшибки` for users and `ПодробноеПредставлениеОшибки` for the event log. Never use `РасширенноеПредставлениеОшибки`: it downloads error descriptions from the internet on each call.
 - The account is released only after the result is written, unlike in the scheduled job.
 

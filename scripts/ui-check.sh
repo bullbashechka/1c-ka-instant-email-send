@@ -1,9 +1,10 @@
 #!/bin/bash
 # Checks the instant-send UI in the local base through the 1C test client, without a person clicking.
 # Builds tools/ui-check into .local/ui-check/, starts a test client (/TESTCLIENT) and runs the scenario
-# in a test manager (/TESTMANAGER /Execute) twice: with Mailpit running ("ok") and stopped ("down").
+# in a test manager (/TESTMANAGER /Execute) once per stage: with Mailpit running ("ok"), stopped ("down")
+# and a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running).
 # Prints what the user would see (windows and their texts), letter states, event log errors
-# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down ...] (default: ok down).
+# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote ...] (default: ok down quote).
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
 
 set -u
@@ -21,7 +22,7 @@ BASE_PATH="$(json databases.0.path)"
 BASE_USER="$(json databases.0.user)"
 
 if [ "$#" -eq 0 ]; then
-  set -- ok down
+  set -- ok down quote
 fi
 
 mkdir -p "$OUT"
@@ -66,4 +67,17 @@ import json, sys
 for m in json.load(sys.stdin).get("messages", []):
     if any(t.get("Address") == "ui-check@test.local" for t in m.get("To", [])):
         print(m.get("Created", "")[:19], "|", m.get("Subject") or "(пустая тема)")
+'
+
+echo "===== Цитата в ответе этапа quote"
+curl -s "http://127.0.0.1:8025/api/v1/messages?limit=50" | python3 -c '
+import json, sys, urllib.request
+for m in json.load(sys.stdin).get("messages", []):
+    if m.get("Subject") == "UI-проверка 6: ответ":
+        with urllib.request.urlopen("http://127.0.0.1:8025/api/v1/message/" + m["ID"]) as r:
+            text = json.load(r).get("Text", "")
+        print(m.get("Created", "")[:19], "| маркер UI-ЦИТАТА-6 в тексте:", text.count("UI-ЦИТАТА-6"), "раз (ожидается 1)")
+        break
+else:
+    print("Письмо «UI-проверка 6: ответ» в Mailpit не найдено")
 '
