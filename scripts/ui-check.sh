@@ -2,9 +2,10 @@
 # Checks the instant-send UI in the local base through the 1C test client, without a person clicking.
 # Builds tools/ui-check into .local/ui-check/, starts a test client (/TESTCLIENT) and runs the scenario
 # in a test manager (/TESTMANAGER /Execute) once per stage: with Mailpit running ("ok"), stopped ("down")
-# and a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running).
+# a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running)
+# and letters opened from «Исходящие» («Отправить сейчас», button visibility, stale windows: "outbox", Mailpit running).
 # Prints what the user would see (windows and their texts), letter states, event log errors
-# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote ...] (default: ok down quote).
+# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox ...] (default: ok down quote outbox).
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
 
 set -u
@@ -22,7 +23,7 @@ BASE_PATH="$(json databases.0.path)"
 BASE_USER="$(json databases.0.user)"
 
 if [ "$#" -eq 0 ]; then
-  set -- ok down quote
+  set -- ok down quote outbox
 fi
 
 mkdir -p "$OUT"
@@ -48,8 +49,8 @@ for STAGE in "$@"; do
   MANAGER=$!
   ELAPSED=0
   while kill -0 "$MANAGER" 2>/dev/null; do
-    if [ "$ELAPSED" -ge 400 ]; then
-      echo "Менеджер тестирования не завершился за 400 с, процесс остановлен." >&2
+    if [ "$ELAPSED" -ge 600 ]; then
+      echo "Менеджер тестирования не завершился за 600 с, процесс остановлен." >&2
       kill "$MANAGER" 2>/dev/null
       break
     fi

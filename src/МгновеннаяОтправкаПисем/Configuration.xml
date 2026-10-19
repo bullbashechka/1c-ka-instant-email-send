@@ -67,6 +67,7 @@
 			<CommonModule>моп_МгновеннаяОтправкаПисем</CommonModule>
 			<CommonModule>моп_МгновеннаяОтправкаПисемВызовСервера</CommonModule>
 			<CommonModule>моп_МгновеннаяОтправкаПисемКлиент</CommonModule>
+			<CommonModule>моп_МгновеннаяОтправкаПисемКлиентСервер</CommonModule>
 			<Catalog>Пользователи</Catalog>
 			<Document>ЭлектронноеПисьмоИсходящее</Document>
 			<DocumentJournal>Взаимодействия</DocumentJournal>

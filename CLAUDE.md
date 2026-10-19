@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П29» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development, YAxUnit tests and the build stay in the local file base `ka-demo`: what remains for us is the local setup (task 0.2), reviewing stages 1–5 one by one, the build and install check, and fixing defects from acceptance. Acceptance (stage 7) is done by the company programmer in the client-server base `elektron_ka` on the office server `gemsrvr`; we don't run tests or scenarios there.
+`PRD.md` (in Russian) is the source of truth. «Ф1»…«Ф9» refer to its features and «П1»…«П34» to its acceptance scenarios; `TASKS.md` tracks the stages. Both extensions are implemented in `src/` and built into `build/*.cfe`; YAxUnit tests were green in `ka-demo`. Development, YAxUnit tests and the build stay in the local file base `ka-demo`: what remains for us is the local setup (task 0.2), reviewing stages 1–5 one by one, the build and install check, and fixing defects from acceptance. Acceptance (stage 7) is done by the company programmer in the client-server base `elektron_ka` on the office server `gemsrvr`; we don't run tests or scenarios there.
 
 The PRD deliberately departs from the director's original ТЗ: sending is asynchronous (background job, up to 3 attempts with pauses 0/10/30 s, user notifications), and the «Отправить сейчас» button is shown for letters in «Исходящие» in client-server bases too. Don't "restore" the ТЗ behavior.
 
@@ -36,8 +36,8 @@ Clicking «Отправить» in the outgoing-email form no longer drops the l
 
 - **Borrowed objects:** only `Документ.ЭлектронноеПисьмоИсходящее` and its `ФормаДокумента`, plus what the form references and the extension can't load without: the journal `Взаимодействия`, the picture `КоллекцияПиктограммФайлов`, the enum `ВариантыВажностиВзаимодействия`, the catalog `Пользователи` and 8 document attributes (listed in PRD). Everything else in KA (common modules `УправлениеЭлектроннойПочтой`, `Взаимодействия`, `РаботаСПочтовымиСообщениями`, `ДлительныеОперации`, registers `ЗаблокированныеДляПолученияУчетныеЗаписи` and `НепринятыеКОбработкеПочтовымСерверомИсходящиеПисьма`) is called from extension code without borrowing.
 - **Interception style:** `&Перед`, `&После`, `&Вместо` with `ПродолжитьВызов()`. Never `&ИзменениеИКонтроль`.
+- **`моп_МгновеннаяОтправкаПисемКлиентСервер`** holds `ДоступностьОтправки`, a pure function with no DB access. It holds the send-availability rules, so it is the main unit-test target. It is client-server because the form uses the same rule for the visibility of «Отправить сейчас» and the server for the click.
 - **`моп_МгновеннаяОтправкаПисем`** (server common module):
-  - `ДоступностьОтправки` is a pure function with no DB access. It holds the send-availability rules, so it is the main unit-test target.
   - **No double send by hiding.** The scheduled job and «Отправить и получить почту» pick letters in one query up front, never re-check status, and unlock the account before writing results. So instead of waiting for them, instant send hides the letter: `ДатаКогдаОтправить = now + 10 min` while sending (both KA queries skip future «Когда отправить»), renewed when less than 5 min is left, cleared in the same write as the outcome. A draft gets the mark in the same write that makes it «Исходящее» (form `&После("ПередЗаписьюНаСервере")`). Only «Отправить сейчас» on a letter that was already «Исходящее» waits for jobs that started before the mark.
   - Account locking reuses the KA register `ЗаблокированныеДляПолученияУчетныеЗаписи` with the 60-minute rule of `УправлениеЭлектроннойПочтой.ЗаблокироватьУчетнуюЗапись`, but a young record only counts while a possible holder is alive (scheduled job, the user command, or an earlier instant send for the same account; job description «Мгновенная отправка письма (<account UUID>)»). In a file base the record always counts. Release deletes the record only if `ДатаБлокировки` is still ours.
   - `НачатьОтправку` deduplicates by the background-job key `"моп_ОтправкаПисьма_" + УникальныйИдентификатор`, clears the scheduled job's rejection record for the letter, hides an «Исходящее» letter, then starts `ОтправитьПисьмоВФоне` through `ДлительныеОперации.ВыполнитьВФоне`.
@@ -56,6 +56,10 @@ Clicking «Отправить» in the outgoing-email form no longer drops the l
 - The standard `ПередЗаписьюНаСервере` appends the quoted original text on every send-write of a «Черновик» (`ВыполняетсяОтправка` and `ВключатьТелоИсходногоПисьма`), and nothing clears the flag. So `ВернутьВЧерновики` clears `ВключатьТелоИсходногоПисьма`, or the next «Отправить» quotes twice.
 - Use `КраткоеПредставлениеОшибки` for users and `ПодробноеПредставлениеОшибки` for the event log. Never use `РасширенноеПредставлениеОшибки`: it downloads error descriptions from the internet on each call.
 - The account is released only after the result is written, unlike in the scheduled job.
+- The standard `ПередЗаписью` puts attachments opened for editing (`Редактируется`) back into the base asynchronously, so the put lands after our synchronous write and job start. The form puts them itself before the send-write.
+- The form command `Отправить` has no «Изменяет сохраняемые данные» flag, so it stays enabled in a read-only form (`УправлениеДоступом.ПриЧтенииНаСервере` sets `ТолькоПросмотр`). Our visibility rule checks `ТолькоПросмотр`.
+- A form keeps the edit lock on the letter from the first change until it closes, even after `Записать()`. Server code that writes the letter from the form's click (hiding, the background job) needs `РазблокироватьДанныеДляРедактирования(Письмо, УникальныйИдентификатор)` first.
+- After a status change, `Прочитать()` leaves the form half-set-up (elements hidden for «Исходящее» stay hidden for a draft). Reopen the form by key instead.
 
 Before assuming how standard code behaves, check it in `.local/ka-config` (see below) or in the live base through the `1c` MCP server.
 
@@ -126,7 +130,7 @@ All code is written test-first, in small red → green → refactor cycles:
 How this applies here:
 
 - Tests come from the spec. Every rule the PRD lists under «Расширение тестов» gets its test before its code:
-  - `ДоступностьОтправки`: all combinations of status, «Когда отправить», «Не отправлять после» and the external-resources lock;
+  - `ДоступностьОтправки`: all combinations of status, «Когда отправить», «Не отправлять после», the deletion mark and the external-resources lock;
   - `ЗахватитьУчетнуюЗапись`/`ОсвободитьУчетнуюЗапись`, including the 60-minute boundary;
   - `СнятьОтказРегламентногоЗадания`;
   - `ПаузаПередПопыткой`.
