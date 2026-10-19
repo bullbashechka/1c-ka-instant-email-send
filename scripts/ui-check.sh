@@ -5,7 +5,10 @@
 # a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running)
 # and letters opened from «Исходящие» («Отправить сейчас», button visibility, stale windows: "outbox", Mailpit running).
 # Prints what the user would see (windows and their texts), letter states, event log errors
-# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox ...] (default: ok down quote outbox).
+# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox|open|copy|unlock ...]
+# (default: ok down quote outbox). Stages for a base copy (install check): "open" opens a new letter, "copy" sends a letter
+# and reopens it from «Исходящие» (П8, a disabled extension), "unlock" allows external resources.
+# BASE_PATH=<folder> runs the check in another file base.
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
 
 set -u
@@ -19,7 +22,7 @@ cd "$ROOT"
 
 json() { plutil -extract "$1" raw -o - "$REGISTRY"; }
 V8PATH="$(json v8path)"
-BASE_PATH="$(json databases.0.path)"
+BASE_PATH="${BASE_PATH:-$(json databases.0.path)}"
 BASE_USER="$(json databases.0.user)"
 
 if [ "$#" -eq 0 ]; then

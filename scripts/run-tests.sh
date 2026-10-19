@@ -1,7 +1,8 @@
 #!/bin/bash
 # Runs the YAxUnit tests of the extension МгновеннаяОтправкаПисемТесты in the local base.
 # Exit codes: 0 — all green, 1 — failures, 2 — the environment is not ready (no result file).
-# Base path, user and platform come from .v8-project.json (the "default" base).
+# Base path, user and platform come from .v8-project.json (the first base); BASE_PATH=<folder> runs them in another
+# file base, for example a copy for the install check.
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
 
 set -u
@@ -17,7 +18,7 @@ fi
 
 json() { plutil -extract "$1" raw -o - "$REGISTRY"; }
 V8PATH="$(json v8path)"
-BASE_PATH="$(json databases.0.path)"
+BASE_PATH="${BASE_PATH:-$(json databases.0.path)}"
 BASE_USER="$(json databases.0.user)"
 
 OUT="$ROOT/.local/tests"
