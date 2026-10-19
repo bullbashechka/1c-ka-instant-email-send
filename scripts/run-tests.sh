@@ -63,7 +63,15 @@ CODE="$(LC_ALL=C tr -cd '0-9' < "$OUT/exit-code.txt")"
 TESTS=0
 if [ -f "$OUT/junit.xml" ]; then
   TESTS="$(grep -o '<testcase ' "$OUT/junit.xml" | wc -l | tr -d ' ')"
-  echo "Тестов: $TESTS. Отчёт: $OUT/junit.xml"
+  SKIPPED="$(xmllint --xpath 'count(//testcase[skipped])' "$OUT/junit.xml")"
+  echo "Тестов: $TESTS, пропущено: $SKIPPED. Отчёт: $OUT/junit.xml"
+  # A skipped test is not a failure, but it checked nothing: show why.
+  for N in $(seq 1 "$SKIPPED"); do
+    [ "$SKIPPED" = "0" ] && break
+    NAME="$(xmllint --xpath "string((//testcase[skipped])[$N]/@classname)" "$OUT/junit.xml")"
+    MESSAGE="$(xmllint --xpath "string((//testcase[skipped])[$N]/skipped/@message)" "$OUT/junit.xml")"
+    echo "- пропущен $NAME: ${MESSAGE:0:300}"
+  done
 fi
 
 # YAxUnit skips a test module that fails to compile and still reports success.
