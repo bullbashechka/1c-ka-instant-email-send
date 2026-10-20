@@ -52,7 +52,7 @@
 			<ScriptVariant>Russian</ScriptVariant>
 			<DefaultRoles/>
 			<Vendor/>
-			<Version>1.0.1</Version>
+			<Version>1.0.2</Version>
 			<DefaultLanguage>Language.Русский</DefaultLanguage>
 			<BriefInformation/>
 			<DetailedInformation/>
@@ -64,6 +64,7 @@
 		<ChildObjects>
 			<Language>Русский</Language>
 			<CommonModule>мопТ_МгновеннаяОтправкаПисем</CommonModule>
+			<CommonModule>мопТ_ОтправкаСчетовНаОплату</CommonModule>
 		</ChildObjects>
 	</Configuration>
 </MetaDataObject>

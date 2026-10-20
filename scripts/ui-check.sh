@@ -4,10 +4,11 @@
 # in a test manager (/TESTMANAGER /Execute) once per stage: with Mailpit running ("ok"), stopped ("down")
 # a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running)
 # letters opened from «Исходящие» («Отправить сейчас», button visibility, stale windows: "outbox", Mailpit running)
-# and letters held open with unsaved edits by another session while they are sent ("hold", Mailpit running, ~5 min).
+# letters held open with unsaved edits by another session while they are sent ("hold", Mailpit running, ~5 min)
+# and the subject of the letter made from an invoice print form ("invoice": «Печать → Счет на оплату → Отправить», the letter is not sent).
 # Prints what the user would see (windows and their texts), letter states, event log errors
-# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox|hold|open|copy|unlock ...]
-# (default: ok down quote outbox hold). Stages for a base copy (install check): "open" opens a new letter, "copy" sends a letter
+# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox|hold|invoice|open|copy|unlock ...]
+# (default: ok down quote outbox hold invoice). Stages for a base copy (install check): "open" opens a new letter, "copy" sends a letter
 # and reopens it from «Исходящие» (П8, a disabled extension), "unlock" allows external resources.
 # BASE_PATH=<folder> runs the check in another file base.
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
@@ -27,7 +28,7 @@ BASE_PATH="${BASE_PATH:-$(json databases.0.path)}"
 BASE_USER="$(json databases.0.user)"
 
 if [ "$#" -eq 0 ]; then
-  set -- ok down quote outbox hold
+  set -- ok down quote outbox hold invoice
 fi
 
 mkdir -p "$OUT"
