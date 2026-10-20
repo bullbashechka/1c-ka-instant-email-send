@@ -3,10 +3,11 @@
 # Builds tools/ui-check into .local/ui-check/, starts a test client (/TESTCLIENT) and runs the scenario
 # in a test manager (/TESTMANAGER /Execute) once per stage: with Mailpit running ("ok"), stopped ("down")
 # a reply with a quote that returned to drafts and is sent again ("quote", Mailpit running)
-# and letters opened from «Исходящие» («Отправить сейчас», button visibility, stale windows: "outbox", Mailpit running).
+# letters opened from «Исходящие» («Отправить сейчас», button visibility, stale windows: "outbox", Mailpit running)
+# and letters held open with unsaved edits by another session while they are sent ("hold", Mailpit running, ~5 min).
 # Prints what the user would see (windows and their texts), letter states, event log errors
-# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox|open|copy|unlock ...]
-# (default: ok down quote outbox). Stages for a base copy (install check): "open" opens a new letter, "copy" sends a letter
+# and the letters that reached Mailpit. Usage: scripts/ui-check.sh [ok|down|quote|outbox|hold|open|copy|unlock ...]
+# (default: ok down quote outbox hold). Stages for a base copy (install check): "open" opens a new letter, "copy" sends a letter
 # and reopens it from «Исходящие» (П8, a disabled extension), "unlock" allows external resources.
 # BASE_PATH=<folder> runs the check in another file base.
 # Must run outside the Claude Code sandbox: 1C exits with 134 inside it.
@@ -26,10 +27,12 @@ BASE_PATH="${BASE_PATH:-$(json databases.0.path)}"
 BASE_USER="$(json databases.0.user)"
 
 if [ "$#" -eq 0 ]; then
-  set -- ok down quote outbox
+  set -- ok down quote outbox hold
 fi
 
 mkdir -p "$OUT"
+# Mailpit keeps letters between runs: letters of this run are counted from this moment (local time, as Mailpit shows it).
+STARTED="$(date +%Y-%m-%dT%H:%M:%S)"
 python3 "$SKILLS/epf-build/scripts/epf-build.py" -InfoBasePath "$BASE_PATH" -UserName "$BASE_USER" \
   -SourceFile tools/ui-check/моп_ПроверкаИнтерфейса.xml -OutputFile "$EPF" -ConfigSrc .local/ka-config || exit 2
 
@@ -72,6 +75,16 @@ for m in json.load(sys.stdin).get("messages", []):
     if any(t.get("Address") == "ui-check@test.local" for t in m.get("To", [])):
         print(m.get("Created", "")[:19], "|", m.get("Subject") or "(пустая тема)")
 '
+
+echo "===== Письма этапа hold в Mailpit с начала проверки (каждое ожидается ровно 1 раз, если этап выполнялся)"
+curl -s "http://127.0.0.1:8025/api/v1/messages?limit=200" | python3 -c '
+import json, sys
+start = sys.argv[1]
+subjects = ["UI-проверка 17: письмо занято", "UI-проверка 18: правка дольше 2 минут"]
+messages = [m for m in json.load(sys.stdin).get("messages", []) if m.get("Created", "") >= start]
+for s in subjects:
+    print(s, "|", sum(1 for m in messages if m.get("Subject") == s), "раз")
+' "$STARTED"
 
 echo "===== Цитата в ответе этапа quote"
 curl -s "http://127.0.0.1:8025/api/v1/messages?limit=50" | python3 -c '
